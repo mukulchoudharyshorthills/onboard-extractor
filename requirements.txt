@@ -1,0 +1,6 @@
+flask
+genai
+MimeTypes
+Optional
+google-generativeai
+google
