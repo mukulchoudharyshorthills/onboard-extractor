@@ -1,5 +1,7 @@
 from flask import Flask, request, redirect, url_for, render_template, jsonify
 from .api_caller import ApiCaller
+from models import user_helper, log_helper, users, loginlogs
+from schemas import UserSchema, UpdateUserSchema, LoginLogSchema
 import os
 import time
 from pymongo import MongoClient
@@ -17,30 +19,32 @@ def login():
     if not username or not password:
         return jsonify({'error': 'Missing username or password'}), 400
 
-    client = MongoClient("mongodb://localhost:27017/")
-    db_name = "your_database_name"
-    if db_name not in client.list_database_names():
-        client[db_name].command("ping")  # This will create the database if it doesn't exist
-    db = client[db_name]
-    
-    if "users" not in db.list_collection_names():
-        db.create_collection("users")
-    users = db["users"]
-    if "login_logs" not in db.list_collection_names():
-        db.create_collection("login_logs")
-    logs = db["login_logs"]
-
     user = users.find_one({"username": username})
     if not user:
-        users.insert_one({"username": username, "password": password})
+        users.insert_one({"username": username, "password": password, "status": "unverified"})
 
-    logs.insert_one({
-        "username": username,
+    user = users.find_one({"username": username})
+    loginlogs.insert_one({
+        "user_id": user["_id"],
         "timestamp": int(time.time()),
         "action": "login"
     })
 
     return jsonify({'message': 'Login successful'}), 200
+
+@app.route('/logout')
+def logout():
+    user_id = request.args.get('id')
+    if not user_id:
+        return jsonify({'error': 'Missing user id'}), 400
+
+    loginlogs.insert_one({
+        "user_id": user_id,
+        "timestamp": int(time.time()),
+        "action": "logout"
+    })
+
+    return jsonify({'message': 'Logout successful'}), 200
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -79,27 +83,23 @@ def upload_file():
 
 @app.route('/verify', methods=['GET'])
 def verify():
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["your_database_name"]
-    collection = db["your_collection_name"]
+    user_id = request.args.get('id')
+    if not user_id:
+        return jsonify({'error': 'Missing user id'}), 400
 
-    result = collection.update_one(
-        {"status": "pending"},
+    result = users.update_one(
+        {"_id": user_id, "status": "unverified"},
         {"$set": {"status": "verified"}}
     )
     return jsonify({'message': 'API is working'}), 200
 
 @app.route('/edit', methods=['POST'])
 def edit():
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["your_database_name"]
-    collection = db["your_collection_name"]
-
     data = request.json
     if not data or "filter" not in data or "update" not in data:
         return jsonify({'error': 'Missing filter or update data'}), 400
 
-    result = collection.update_one(
+    result = users.update_one(
         data["filter"],
         {"$set": data["update"]}
     )
