@@ -3,4 +3,6 @@ genai
 MimeTypes
 Optional
 google-generativeai
-google
+google-cloud-vision
+google-genai
+pymongo

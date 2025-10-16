@@ -41,8 +41,8 @@ class ApiCaller:
     def _get_prompt_part(self,
                          prompt_file: Optional[str]) -> Part:
         if (prompt_file is None):
-            return "Either prompt_text or prompt_file must " + "be provided"
-        if prompt_file is not None:
+            return "Either prompt_file must " + "be provided"
+        else:
             with open(prompt_file, 'r') as f:
                 prompt_text = f.read()
 
