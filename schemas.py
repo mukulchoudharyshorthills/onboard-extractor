@@ -18,3 +18,19 @@ class LoginLogSchema(BaseModel):
     user_id: str
     login_time: str
     action: str
+
+class DocumentSchema(BaseModel):
+    user_id: str
+    path: str
+    title: str
+    tag: str
+    data: dict
+    edited_data: dict
+
+class UpdateDocumentSchema(BaseModel):
+    user_id: str
+    path: Optional[str]
+    title: Optional[str]
+    tag: Optional[str]
+    data: Optional[dict]
+    edited_data: Optional[dict]

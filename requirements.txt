@@ -6,3 +6,5 @@ google-generativeai
 google-cloud-vision
 google-genai
 pymongo
+pydantic
+bson

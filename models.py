@@ -12,6 +12,10 @@ if "loginlogs" not in db.list_collection_names():
     db.create_collection("loginlogs")
 loginlogs = db['loginlogs']
 
+if "documents" not in db.list_collection_names():
+    db.create_collection("documents")
+documents = db['documents']
+
 
 def user_helper(user) -> dict:
     return {
@@ -28,4 +32,15 @@ def log_helper(log) -> dict:
     "user_id": log["user_id"],
     "login_time": log["login_time"],
     "action": log["action"]
+    }
+
+def document_helper(document) -> dict:
+    return {
+    "id": str(document["_id"]),
+    "user_id": document["user_id"],
+    "path": document["path"],
+    "title": document["title"],
+    "tag": document["tag"],
+    "data": document["data"],
+    "edited_data": document["edited_data"]
     }
