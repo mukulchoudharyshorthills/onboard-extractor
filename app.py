@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, url_for, render_template, jsonify
 from .api_caller import ApiCaller
-from models import user_helper, log_helper, users, loginlogs
-from schemas import UserSchema, UpdateUserSchema, LoginLogSchema
+from models import user_helper, log_helper, users, loginlogs, documents, document_helper
+from schemas import UserSchema, UpdateUserSchema, LoginLogSchema, DocumentSchema, UpdateDocumentSchema
 import os
 import time
 from pymongo import MongoClient
@@ -9,9 +9,9 @@ from bson import ObjectId
 
 app = Flask(__name__)
 
-@app.route('/hello')
-def hello_world():
-   return 'Hello World!'
+@app.route('/ping')
+def ping():
+   return 'pong!'
 
 @app.route('/login')
 def login():
@@ -84,12 +84,12 @@ def upload_file():
 
 @app.route('/verify', methods=['GET'])
 def verify():
-    user_id = request.args.get('id')
-    if not user_id:
-        return jsonify({'error': 'Missing user id'}), 400
+    id = request.args.get('id')
+    if not id:
+        return jsonify({'error': 'Missing document id'}), 400
 
-    result = users.update_one(
-        {"_id": user_id, "status": "unverified"},
+    result = documents.update_one(
+        {"_id": id, "status": "unverified"},
         {"$set": {"status": "verified"}}
     )
     return jsonify({'message': 'API is working'}), 200

@@ -26,6 +26,7 @@ class DocumentSchema(BaseModel):
     tag: str
     data: dict
     edited_data: dict
+    status: Optional[str]
 
 class UpdateDocumentSchema(BaseModel):
     user_id: str
@@ -34,3 +35,4 @@ class UpdateDocumentSchema(BaseModel):
     tag: Optional[str]
     data: Optional[dict]
     edited_data: Optional[dict]
+    status: Optional[str]

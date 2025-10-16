@@ -42,5 +42,6 @@ def document_helper(document) -> dict:
     "title": document["title"],
     "tag": document["tag"],
     "data": document["data"],
-    "edited_data": document["edited_data"]
+    "edited_data": document["edited_data"],
+    "status": document["status"]
     }
