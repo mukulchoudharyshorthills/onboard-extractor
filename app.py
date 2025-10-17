@@ -68,17 +68,17 @@ def upload_file():
             file_path = f"./input/{file.filename}"
         file.save(file_path)
 
-        caller = ApiCaller(
-            api_key=api_key,  # Replace with your actual API key
-        )
+    caller = ApiCaller(
+        api_key=api_key,  # Replace with your actual API key
+    )
 
-        data = caller.extract(
-            prompt_file=prompt_file,
-            path=file_path
-        )
+    data = caller.extract(
+        prompt_file=prompt_file,
+        path=file_path
+    )
 
-        print(data)
-        responses.append({'message': 'File uploaded successfully', 'filename': file.filename, 'data': data})
+    print(data)
+    responses.append({'message': 'File uploaded successfully', 'filename': file.filename, 'data': data})
 
     return jsonify(responses), 200
 
