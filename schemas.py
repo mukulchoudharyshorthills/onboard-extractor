@@ -22,10 +22,10 @@ class LoginLogSchema(BaseModel):
 class DocumentSchema(BaseModel):
     user_id: str
     path: str
-    title: str
-    tag: str
-    data: dict
-    edited_data: dict
+    title: Optional[str]
+    tag: Optional[str]
+    data: Optional[dict]
+    edited_data: Optional[dict]
     status: Optional[str]
 
 class UpdateDocumentSchema(BaseModel):

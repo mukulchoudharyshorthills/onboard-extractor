@@ -49,6 +49,7 @@ def logout():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    id = request.form.get('id')
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -67,6 +68,13 @@ def upload_file():
             file.filename = f"{name}_{timestamp}{ext}"
             file_path = f"./input/{file.filename}"
         file.save(file_path)
+    
+    documents.insert_one({
+        "user_id": request.form.get('user_id', 'unknown'),
+        "path": file_path,
+        "title": request.form.get('title', ''),
+        "tag": request.form.get('tag', '')
+    })
 
     caller = ApiCaller(
         api_key=api_key,  # Replace with your actual API key
@@ -77,6 +85,11 @@ def upload_file():
         path=file_path
     )
 
+    result = documents.update_one(
+        {"_id": id},
+        {"$set": {"data": data, "status": "verified"}}
+    )
+    
     print(data)
     responses.append({'message': 'File uploaded successfully', 'filename': file.filename, 'data': data})
 
@@ -96,13 +109,16 @@ def verify():
 
 @app.route('/edit', methods=['POST'])
 def edit():
+    id = request.args.get('id')
+    if not id:
+        return jsonify({'error': 'Missing document id'}), 400
     data = request.json
     if not data or "filter" not in data or "update" not in data:
         return jsonify({'error': 'Missing filter or update data'}), 400
 
-    result = users.update_one(
-        data["filter"],
-        {"$set": data["update"]}
+    result = documents.update_one(
+        {"_id": id, "status": "unverified"},
+        {"$set": {"edited_data": data["update"], "status": "verified"}}
     )
     return jsonify({'message': 'API is working'}), 200
 
